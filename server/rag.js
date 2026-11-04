@@ -1,9 +1,9 @@
 import ollama from "ollama";
 import { MongoClient } from "mongodb";
 
-const col = new MongoClient("mongodb://localhost:27017")
-  .db("askmynotes")
-  .collection("chunks");
+const client = new MongoClient("mongodb://localhost:27017");
+await client.connect();
+const col = client.db("askmynotes").collection("chunks");
 
 const cosine = (a, b) => {
   let dot = 0,
