@@ -42,20 +42,24 @@ function App() {
     for (const f of e?.target?.files) {
       form.append("files", f);
     }
-    setStatus("Uploading and indexing...");
-    const res = await fetch(`${API}/api/upload`, {
-      method: "POST",
-      headers,
-      body: form,
-    });
-    const data = await res.json();
-    setStatus(
-      res.ok
-        ? `Added: ${data.summary.map((s) => `${s.file} (${s.chunks} chunks)`).join(", ")}`
-        : data.error,
-    );
-    e.target.value = "";
-    loadFiles();
+    try {
+      setStatus("Uploading and indexing...");
+      const res = await fetch(`${API}/api/upload`, {
+        method: "POST",
+        headers,
+        body: form,
+      });
+      const data = await res.json();
+      setStatus(
+        res.ok
+          ? `Added: ${data.summary.map((s) => `${s.file} (${s.chunks} chunks)`).join(", ")}`
+          : data.error,
+      );
+      e.target.value = "";
+      loadFiles();
+    } catch (error) {
+      setStatus(error.message);
+    }
   }
 
   async function deleteAll() {
@@ -118,6 +122,7 @@ function App() {
         style={{ border: "1px solid #ccc", borderRadius: 8, padding: 12 }}
       >
         <input
+          className="file"
           type="file"
           multiple
           accept=".txt,.md,.docx"
@@ -158,7 +163,7 @@ function App() {
           cols="60"
         />
         <br />
-        <button onClick={send} disabled={busy}>
+        <button className="btn" onClick={send} disabled={busy}>
           Send
         </button>
         {busy && <button onClick={() => stopRef.current?.abort()}>Stop</button>}

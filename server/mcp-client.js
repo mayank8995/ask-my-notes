@@ -35,7 +35,7 @@ for (let step = 0; step < 5; step++) {
   const res = await ollama.chat({ model: "llama3.2", messages, tools });
   messages.push(res.message);
   if (!res.message.tool_calls?.length) {
-    console.log("ANSWER:", res.message.content);
+    // console.log("ANSWER:", res.message.content);
     break;
   }
   for (const call of res.message.tool_calls) {

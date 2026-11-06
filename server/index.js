@@ -136,11 +136,11 @@ app.post("/api/chat", async (req, res) => {
 
   try {
     const hits = await retrieve(userId, question);
-    console.log(
-      "QUESTION:",
-      question,
-      hits.map((h) => `${h.score.toFixed(3)} ${h.source}`),
-    );
+    // console.log(
+    //   "QUESTION:",
+    //   question,
+    //   hits.map((h) => `${h.score.toFixed(3)} ${h.source}`),
+    // );
 
     const context = hits.map((h) => `[${h.source}]\n${h.text}`).join("\n---\n");
     const system =
