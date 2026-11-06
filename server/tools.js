@@ -1,5 +1,5 @@
 import ollama from "ollama";
-import { retrieve } from "./rag.js";
+import { retrieve } from "./old__rag.js";
 
 // function to be called tthorugh tool calling
 const functions = {
@@ -40,13 +40,13 @@ for (let step = 0; step < 5; step++) {
   const res = await ollama.chat({ model: "llama3.2:1b", messages, tools });
   messages.push(res.message);
   if (!res.message.tool_calls?.length) {
-    console.log("\nANSWER:", res.message.content);
+    // console.log("\nANSWER:", res.message.content);
     break;
   }
 
   for (const call of res.message.tool_calls) {
     const { name, arguments: args } = call.function;
-    console.log("MODEL WANTS:", name, args);
+    // console.log("MODEL WANTS:", name, args);
     const result = await functions[name](args);
     messages.push({ role: "tool", content: String(result) });
   }

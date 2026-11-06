@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { retrieve } from "./rag.js";
+import { retrieve } from "./old__rag.js";
 
 const server = new McpServer({ name: "ask-my-notes", version: "1.0.0" });
 
