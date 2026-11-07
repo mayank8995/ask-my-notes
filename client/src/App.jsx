@@ -192,7 +192,7 @@ function App() {
           onChange={onUpload}
         />
         <p className="hint">
-          ⓘ Up to 5 files at a time · max 2 MB each · .txt, .md, .docx
+          ⓘ Up to 5 files at a time · max 10 MB each · .txt, .md, .docx
         </p>
         <p className="status">{status}</p>
         <ul className="file-list">

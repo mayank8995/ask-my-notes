@@ -43,11 +43,11 @@ async function requireUser(req, res, next) {
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 2 * 1024 * 1024, files: 5 }, // 2 MB each, 5 files at a time
+  limits: { fileSize: 10 * 1024 * 1024, files: 5 }, // 10 MB each, 5 files at a time
 });
 
 const uploadErrors = {
-  LIMIT_FILE_SIZE: "File too large (max 2 MB per file)",
+  LIMIT_FILE_SIZE: "File too large (max 10 MB per file)",
   LIMIT_FILE_COUNT: "Too many files (max 5 at a time)",
   LIMIT_UNEXPECTED_FILE: "Too many files (max 5 at a time)",
 };
