@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import "./App.css";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth, login, logout, authHeaders } from "./firebase";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -13,22 +15,41 @@ function getUserId() {
 }
 
 function App() {
+  // Track the signed-in user, and load files once they're known:
+  const [user, setUser] = useState(undefined); // undefined = still checking
   const [files, setFiles] = useState([]);
   const [status, setStatus] = useState("");
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const stopRef = useRef(null);
-  const headers = { "x-user-id": getUserId() };
+  // const headers = { "x-user-id": getUserId() };
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    loadFiles();
-  }, []);
+  // useEffect(() => {
+  //   loadFiles();
+  // }, []);
+  useEffect(
+    () =>
+      onAuthStateChanged(auth, (u) => {
+        setUser(u);
+
+        setFiles([]);
+        setMessages([]);
+        setInput([]);
+        setBusy(false);
+        setStatus("");
+
+        if (u) loadFiles();
+      }),
+    [],
+  );
 
   async function loadFiles() {
     try {
-      const res = await fetch(`${API}/api/files`, { headers });
+      const res = await fetch(`${API}/api/files`, {
+        headers: await authHeaders(),
+      });
       if (!res.ok) {
         throw new Error(`${response.status}`);
       }
@@ -46,7 +67,7 @@ function App() {
       setStatus("Uploading and indexing...");
       const res = await fetch(`${API}/api/upload`, {
         method: "POST",
-        headers,
+        headers: await authHeaders(),
         body: form,
       });
       const data = await res.json();
@@ -63,7 +84,10 @@ function App() {
   }
 
   async function deleteAll() {
-    await fetch(`${API}/api/files`, { method: "DELETE", headers });
+    await fetch(`${API}/api/files`, {
+      method: "DELETE",
+      headers: await authHeaders(),
+    });
     setStatus("All notes deleted");
     loadFiles();
   }
@@ -81,7 +105,10 @@ function App() {
       setLoading(true);
       const res = await fetch(`${API}/api/chat`, {
         method: "POST",
-        headers: { ...headers, "Content-Type": "application/json" },
+        headers: {
+          ...(await authHeaders()),
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ messages: history }),
         signal: controller.signal,
       });
@@ -107,6 +134,9 @@ function App() {
     }
   }
 
+  if (user === undefined) return <p>Loading...</p>;
+  if (!user) return <button onClick={login}>Sign in with Google</button>;
+
   return (
     <div
       style={{
@@ -117,7 +147,9 @@ function App() {
       }}
     >
       <h2>Ask My Notes</h2>
-
+      <p>
+        Signed in as {user.email} <button onClick={logout}>Sign out</button>
+      </p>
       <section
         style={{ border: "1px solid #ccc", borderRadius: 8, padding: 12 }}
       >

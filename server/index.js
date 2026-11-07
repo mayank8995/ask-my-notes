@@ -7,20 +7,38 @@ import mammoth from "mammoth";
 import rateLimit from "express-rate-limit";
 import { chunks } from "./db.js";
 import { embed, chatStream } from "./llm.js";
+import { initializeApp, cert } from "firebase-admin";
+import { getAuth } from "firebase-admin/auth";
 
+initializeApp({
+  credential: cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)),
+});
 const app = express();
 app.set("trust proxy", 1);
 app.use(cors({ origin: process.env.CLIENT_ORIGIN }));
 app.use(express.json({ limit: "100kb" }));
 app.use("/api", rateLimit({ windowMs: 60_000, limit: 20 })); // 20 requests per minute per IP
+app.use("/api", requireUser);
 
-function getUserId(req, res) {
-  const id = req.get("x-user-id");
-  if (!id || !/^[0-9a-f-]{36}$/.test(id)) {
-    res.status(400).json({ error: "Missing user id" });
-    return null;
+// function getUserId(req, res) {
+//   const id = req.get("x-user-id");
+//   if (!id || !/^[0-9a-f-]{36}$/.test(id)) {
+//     res.status(400).json({ error: "Missing user id" });
+//     return null;
+//   }
+//   return id;
+// }
+
+async function requireUser(req, res, next) {
+  const token = req.get("authorization")?.replace("Bearer ", "");
+  if (!token) return res.status(401).json({ error: "Please sign in" });
+  try {
+    const decoded = await getAuth().verifyIdToken(token); // checks signature + expiry
+    req.userId = decoded.uid; // Firebase's permanent id for this user
+    next();
+  } catch {
+    res.status(401).json({ error: "Login expired, please sign in again" });
   }
-  return id;
 }
 
 const upload = multer({
@@ -47,7 +65,7 @@ function chunk(text, size = 500, overlap = 100) {
 }
 
 app.post("/api/upload", upload.array("files"), async (req, res) => {
-  const userId = getUserId(req, res);
+  const userId = req.userId;
   if (!userId) return;
   try {
     const summary = [];
@@ -82,7 +100,7 @@ app.post("/api/upload", upload.array("files"), async (req, res) => {
 
 // List my files
 app.get("/api/files", async (req, res) => {
-  const userId = getUserId(req, res);
+  const userId = req.userId;
   if (!userId) return;
   const files = await chunks
     .aggregate([
@@ -95,7 +113,7 @@ app.get("/api/files", async (req, res) => {
 
 // Delete all my notes
 app.delete("/api/files", async (req, res) => {
-  const userId = getUserId(req, res);
+  const userId = req.userId;
   if (!userId) return;
   await chunks.deleteMany({ userId });
   res.json({ ok: true });
@@ -128,7 +146,7 @@ async function retrieve(userId, question, k = 4) {
 }
 
 app.post("/api/chat", async (req, res) => {
-  const userId = getUserId(req, res);
+  const userId = req.userId;
   if (!userId) return;
   const messages = (req.body.messages ?? []).slice(-10); // slice(-10) keeps the last 10 messages, which is about 5 questions and 5 answers.
   const question = messages.at(-1)?.content?.slice(0, 2000);
