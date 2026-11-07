@@ -13,6 +13,7 @@ function getUserId() {
   }
   return id;
 }
+const MCP_ON = import.meta.env.VITE_MCP_ENABLED === "true";
 
 function App() {
   // Track the signed-in user, and load files once they're known:
@@ -23,12 +24,9 @@ function App() {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const stopRef = useRef(null);
-  // const headers = { "x-user-id": getUserId() };
   const [loading, setLoading] = useState(false);
+  const [mcpKey, setMcpKey] = useState("");
 
-  // useEffect(() => {
-  //   loadFiles();
-  // }, []);
   useEffect(
     () =>
       onAuthStateChanged(auth, (u) => {
@@ -44,6 +42,16 @@ function App() {
       }),
     [],
   );
+
+  async function createMcpKey() {
+    try {
+      const res = await fetch(`${API}/api/mcp-key`, {
+        method: "POST",
+        headers: await authHeaders(),
+      });
+      setMcpKey((await res.json()).key);
+    } catch (error) {}
+  }
 
   async function loadFiles() {
     try {
@@ -152,7 +160,6 @@ function App() {
         </div>
       </div>
     );
-
   return (
     <div className="app">
       <header className="header">
@@ -162,6 +169,17 @@ function App() {
           <button className="btn-secondary" onClick={logout}>
             Sign out
           </button>
+          {MCP_ON && user && (
+            <button className="btn-secondary" onClick={createMcpKey}>
+              Get MCP key
+            </button>
+          )}
+          {mcpKey && (
+            <p>
+              Your MCP key, copy it now (it is shown only once):{" "}
+              <code>{mcpKey}</code>
+            </p>
+          )}
         </div>
       </header>
       <section className="card">
