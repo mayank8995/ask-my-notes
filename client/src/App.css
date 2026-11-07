@@ -1,0 +1,331 @@
+/* ---------- Background ---------- */
+:root {
+  --surface: #ffffff;
+  --page-bg:
+    radial-gradient(1200px 600px at 10% -10%, rgba(170, 59, 255, 0.08), transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, rgba(59, 130, 246, 0.06), transparent 60%),
+    #faf9fc;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1016;
+    --surface: #181922;
+    --border: #262833;
+    --code-bg: #20222c;
+    --page-bg:
+      radial-gradient(1200px 600px at 10% -10%, rgba(192, 132, 252, 0.14), transparent 60%),
+      radial-gradient(900px 500px at 110% 10%, rgba(59, 130, 246, 0.1), transparent 60%),
+      linear-gradient(180deg, #11121a 0%, #0b0c11 100%);
+  }
+}
+
+body {
+  background: var(--page-bg);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+#root {
+  border-inline: none;
+}
+
+/* ---------- Shared ---------- */
+.app,
+.auth {
+  text-align: left;
+  color: var(--text);
+}
+
+.btn,
+.btn-secondary,
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    transform 0.05s,
+    opacity 0.15s;
+}
+
+.btn:active,
+.btn-secondary:active,
+.btn-danger:active {
+  transform: translateY(1px);
+}
+
+.btn {
+  background: var(--accent);
+  color: #fff;
+}
+.btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-h);
+  border-color: var(--border);
+}
+.btn-secondary:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+}
+
+.btn-danger {
+  background: transparent;
+  color: #dc2626;
+  border-color: rgba(220, 38, 38, 0.4);
+}
+.btn-danger:hover {
+  background: rgba(220, 38, 38, 0.08);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+.card-title {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+/* ---------- Auth / loading ---------- */
+.auth {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+  padding: 36px 28px;
+}
+
+.auth-card h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-h);
+}
+
+.auth-card p {
+  margin: 0 0 24px;
+  font-size: 15px;
+}
+
+.auth-card .btn {
+  width: 100%;
+  padding: 12px 18px;
+}
+
+/* ---------- Layout ---------- */
+.app {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 32px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-h);
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  min-width: 0;
+}
+
+.user-email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Upload ---------- */
+.file {
+  width: 100%;
+  padding: 14px;
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  background: var(--social-bg);
+  font-size: 14px;
+  color: var(--text);
+}
+.file:hover {
+  border-color: var(--accent-border);
+}
+.file::file-selector-button {
+  margin-right: 12px;
+  padding: 7px 14px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.hint {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--text);
+  opacity: 0.85;
+}
+
+.status {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: var(--accent);
+}
+.status:empty {
+  display: none;
+}
+
+.file-list {
+  list-style: none;
+  margin: 12px 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.file-list:empty {
+  display: none;
+}
+.file-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--code-bg);
+  font-size: 14px;
+  color: var(--text-h);
+  word-break: break-word;
+}
+.file-list li span {
+  flex-shrink: 0;
+  color: var(--text);
+}
+
+/* ---------- Chat ---------- */
+.chat {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.messages:empty {
+  display: none;
+}
+
+.msg {
+  margin: 0;
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  white-space: pre-wrap;
+  font-size: 15px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+.msg b {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.75;
+}
+.msg.user {
+  align-self: flex-end;
+  background: var(--accent);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+.msg.assistant {
+  align-self: flex-start;
+  background: var(--code-bg);
+  color: var(--text-h);
+  border-bottom-left-radius: 4px;
+}
+
+.loading {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.composer textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text-h);
+  font-size: 15px;
+  line-height: 1.5;
+  resize: vertical;
+  outline: none;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.composer textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}

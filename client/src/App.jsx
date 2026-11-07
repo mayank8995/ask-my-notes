@@ -134,25 +134,38 @@ function App() {
     }
   }
 
-  if (user === undefined) return <p>Loading...</p>;
-  if (!user) return <button onClick={login}>Sign in with Google</button>;
+  if (user === undefined)
+    return (
+      <div className="auth">
+        <p className="loading">Loading...</p>
+      </div>
+    );
+  if (!user)
+    return (
+      <div className="auth">
+        <div className="card auth-card">
+          <h1>Ask My Notes</h1>
+          <p>Upload your notes and chat with them.</p>
+          <button className="btn" onClick={login}>
+            Sign in with Google
+          </button>
+        </div>
+      </div>
+    );
 
   return (
-    <div
-      style={{
-        maxWidth: 720,
-        margin: "32px auto",
-        padding: 16,
-        fontFamily: "sans-serif",
-      }}
-    >
-      <h2>Ask My Notes</h2>
-      <p>
-        Signed in as {user.email} <button onClick={logout}>Sign out</button>
-      </p>
-      <section
-        style={{ border: "1px solid #ccc", borderRadius: 8, padding: 12 }}
-      >
+    <div className="app">
+      <header className="header">
+        <h2>Ask My Notes</h2>
+        <div className="user">
+          <span className="user-email">Signed in as {user.email}</span>
+          <button className="btn-secondary" onClick={logout}>
+            Sign out
+          </button>
+        </div>
+      </header>
+      <section className="card">
+        <h3 className="card-title">Your notes</h3>
         <input
           className="file"
           type="file"
@@ -160,45 +173,58 @@ function App() {
           accept=".txt,.md,.docx"
           onChange={onUpload}
         />
-        <p>{status}</p>
-        <ul>
+        <p className="hint">
+          ⓘ Up to 5 files at a time · max 2 MB each · .txt, .md, .docx
+        </p>
+        <p className="status">{status}</p>
+        <ul className="file-list">
           {files?.map((f) => (
             <li key={f.file}>
-              {f.file} ({f.chunks} chunks)
+              {f.file} <span>{f.chunks} chunks</span>
             </li>
           ))}
         </ul>
         {files?.length > 0 && (
-          <button onClick={deleteAll}>Delete all my notes</button>
+          <button className="btn-danger" onClick={deleteAll}>
+            Delete all my notes
+          </button>
         )}
       </section>
 
-      <section style={{ marginTop: 16 }}>
-        {messages?.map((m, i) => (
-          <p key={i} style={{ whiteSpace: "pre-wrap" }}>
-            <b>{m.role === "user" ? "You" : "Assistant"}:</b> {m.content}
-          </p>
-        ))}
-        <>
-          {loading && "Loading..."}
-          <br />
-        </>
-        <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && send()}
-          placeholder={
-            files?.length ? "Ask about your notes..." : "Upload a note first"
-          }
-          style={{ width: "70%" }}
-          rows="10"
-          cols="60"
-        />
-        <br />
-        <button className="btn" onClick={send} disabled={busy}>
-          Send
-        </button>
-        {busy && <button onClick={() => stopRef.current?.abort()}>Stop</button>}
+      <section className="chat">
+        <div className="messages">
+          {messages?.map((m, i) => (
+            <p key={i} className={`msg ${m.role}`}>
+              <b>{m.role === "user" ? "You" : "Assistant"}</b>
+              {m.content}
+            </p>
+          ))}
+        </div>
+        {loading && <div className="loading">Loading...</div>}
+        <div className="composer">
+          <textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && send()}
+            placeholder={
+              files?.length ? "Ask about your notes..." : "Upload a note first"
+            }
+            rows="5"
+          />
+          <div className="actions">
+            {busy && (
+              <button
+                className="btn-secondary"
+                onClick={() => stopRef.current?.abort()}
+              >
+                Stop
+              </button>
+            )}
+            <button className="btn" onClick={send} disabled={busy}>
+              Send
+            </button>
+          </div>
+        </div>
       </section>
     </div>
   );

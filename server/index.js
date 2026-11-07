@@ -46,6 +46,26 @@ const upload = multer({
   limits: { fileSize: 2 * 1024 * 1024, files: 5 }, // 2 MB each, 5 files at a time
 });
 
+const uploadErrors = {
+  LIMIT_FILE_SIZE: "File too large (max 2 MB per file)",
+  LIMIT_FILE_COUNT: "Too many files (max 5 at a time)",
+  LIMIT_UNEXPECTED_FILE: "Too many files (max 5 at a time)",
+};
+
+// Run multer and turn its errors into JSON the UI can show
+function uploadFiles(req, res, next) {
+  upload.array("files", 5)(req, res, (err) => {
+    if (!err) return next();
+    if (err instanceof multer.MulterError) {
+      const status = err.code === "LIMIT_FILE_SIZE" ? 413 : 400;
+      return res
+        .status(status)
+        .json({ error: uploadErrors[err.code] ?? err.message });
+    }
+    res.status(500).json({ error: "Upload failed" });
+  });
+}
+
 async function toText(file) {
   const name = file.originalname.toLowerCase();
   if (name.endsWith(".docx"))
@@ -64,7 +84,7 @@ function chunk(text, size = 500, overlap = 100) {
   return out.filter((p) => p.trim());
 }
 
-app.post("/api/upload", upload.array("files"), async (req, res) => {
+app.post("/api/upload", uploadFiles, async (req, res) => {
   const userId = req.userId;
   if (!userId) return;
   try {
