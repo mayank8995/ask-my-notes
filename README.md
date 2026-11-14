@@ -1,3 +1,3 @@
-Ask My Notes: a React chat app with a Node.js + Express backend that answers questions about your own notes, using different LLM models.
-RAG, MCP
+A multi-user RAG notes assistant (React, Node/Express, MongoDB Atlas Vector Search) with
+per-user retrieval filtering, streaming answers, Firebase Auth.
 Link - https://ask-my-notes-gamma.vercel.app/
